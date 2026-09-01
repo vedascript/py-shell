@@ -2,7 +2,7 @@ import sys
 
 
 def main():
-    # while True:
+    while True:
         sys.stdout.write("$ ")
         # REPL is achieved using input
         command = input()
