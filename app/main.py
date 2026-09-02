@@ -1,6 +1,21 @@
+
 import sys
 import os
 
+
+def is_command_executable(command_to_run):
+    PATH =  os.environ["PATH"]; 
+    dir_path_array = PATH.split(os.pathsep);
+
+    for dir_path in dir_path_array:
+        file_path = os.path.join(dir_path, command_to_run);
+        does_file_exists = os.path.isfile(file_path);
+        has_execute_permission = os.access(file_path, os.X_OK);
+
+        if(does_file_exists and has_execute_permission):
+           return {'is_executable':True, 'file_path': file_path};
+
+    return {'is_executable':False, 'file_path': None};       
 
 def main():
     is_shell_running = True;
@@ -15,29 +30,21 @@ def main():
         if(command == "exit"):
             is_shell_running = False;
             break;
+
         elif(command == "echo"):
             print(" ".join(command_args));
+
         elif(command == "type"):
             arg = "".join(command_args);
             if(arg == 'type' or arg == 'exit' or arg == 'echo'):
                 print(f"{arg} is a shell builtin");
             else:
-                PATH =  os.environ["PATH"]; 
-                dir_path_array = PATH.split(os.pathsep);
-                found_arg = False;
-                
-                for dir_path in dir_path_array:
-                    file_path = os.path.join(dir_path, arg);
-                    does_file_exists = os.path.isfile(file_path);
-                    has_execute_permission = os.access(file_path, os.X_OK);
+                exec_config = is_command_executable(arg);   
+                if(exec_config['is_executable']):
+                    print(f"{arg} is {exec_config['file_path']}");
+                    break;
 
-                    if(has_execute_permission and does_file_exists):
-                        print(f"{arg} is {file_path}");
-                        found_arg = True;
-                        break;
-                    else:
-                        continue; 
-                not found_arg and print(f"{arg}: not found");    
+                print(f"{arg}: not found");    
         else:    
             print(f"{command}: command not found");
     
