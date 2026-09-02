@@ -48,8 +48,7 @@ def main():
         else:    
             exec_config = is_command_executable(command);
             if(exec_config['is_executable']):
-                # subprocess.run(['mkdir','abc']);
-                print(f"arr: {user_input}")
+                subprocess.run([command, *command_args]);
             else:    
                 print(f"{command}: command not found");
     
@@ -57,7 +56,3 @@ if __name__ == "__main__":
     main()
 
 
-# traverse through the PATH var. 
-# Divide it into separate valid paths (os.pathstep)
-# Check if the dir in the path exists on disk
-# Check if file is executable
