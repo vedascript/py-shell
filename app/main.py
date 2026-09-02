@@ -25,19 +25,18 @@ def main():
                 PATH =  os.environ["PATH"]; 
                 print(f"PATH: {PATH}")
                 dir_path_array = PATH.split(os.pathsep);
-                print(f"dir_path_aray {dir_path_array}")
                 found_arg = False;
                 
                 for dir_path in dir_path_array:
                    sub_path_arr = dir_path.split("/")[1:];
-                  
-
+                   file_path = os.path.join(dir_path, arg);
+    
                    if(arg in sub_path_arr):
-                        does_dir_exists = os.path.exists(dir_path);
-                        has_execute_permission = os.access(dir_path, os.X_OK);
+                        does_file_exists = os.path.isfile(file_path);
+                        has_execute_permission = os.access(file_path, os.X_OK);
 
-                        if(has_execute_permission and does_dir_exists):
-                             print(f"{arg} is {dir_path}");
+                        if(has_execute_permission and does_file_exists):
+                             print(f"{arg} is {file_path}");
                              found_arg = True;
                              break;
                    else:
