@@ -1,4 +1,5 @@
 import sys
+import os
 
 
 def main():
@@ -20,10 +21,31 @@ def main():
             arg = "".join(command_args);
             if(arg == 'type' or arg == 'exit' or arg == 'echo'):
                 print(f"{arg} is a shell builtin");
-            else:    
+            else:
+                PATH =  os.environ["PATH"]; 
+                dir_path_array = PATH.split(os.pathsep);
+    
+                for dir_path in dir_path_array:
+                   sub_path_arr = dir_path.split("/")[1:];
+                 
+                   if(command in sub_path_arr):
+                        does_dir_exists = os.path.exists(dir_path);
+                        has_execute_permission = os.access(dir_path, os.X_OK);
+                        
+                        if(has_execute_permission and does_dir_exists):
+                             print(f"{command} is {dir_path}");
+                             break;
+                   else:
+                        continue; 
                 print(f"{arg}: not found");    
         else:    
             print(f"{command}: command not found");
     
 if __name__ == "__main__":
     main()
+
+
+# traverse through the PATH var. 
+# Divide it into separate valid paths (os.pathstep)
+# Check if the dir in the path exists on disk
+# Check if file is executable
