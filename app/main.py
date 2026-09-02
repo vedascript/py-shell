@@ -1,7 +1,7 @@
 
 import sys
 import os
-
+import subprocess
 
 def is_command_executable(command_to_run):
     PATH =  os.environ["PATH"]; 
@@ -46,7 +46,12 @@ def main():
 
                 print(f"{arg}: not found");    
         else:    
-            print(f"{command}: command not found");
+            exec_config = is_command_executable(command);
+            if(exec_config['is_executable']):
+                # subprocess.run(['mkdir','abc']);
+                print(f"arr: {user_input}")
+            else:    
+                print(f"{command}: command not found");
     
 if __name__ == "__main__":
     main()
