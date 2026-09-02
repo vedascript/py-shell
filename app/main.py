@@ -24,20 +24,23 @@ def main():
             else:
                 PATH =  os.environ["PATH"]; 
                 dir_path_array = PATH.split(os.pathsep);
-    
+                found_arg = False;
+                
                 for dir_path in dir_path_array:
                    sub_path_arr = dir_path.split("/")[1:];
-                 
-                   if(command in sub_path_arr):
+                   args = ' '.join(command_args);
+
+                   if(args in sub_path_arr):
                         does_dir_exists = os.path.exists(dir_path);
                         has_execute_permission = os.access(dir_path, os.X_OK);
-                        
+
                         if(has_execute_permission and does_dir_exists):
-                             print(f"{command} is {dir_path}");
+                             print(f"{args} is {dir_path}");
+                             found_arg = True;
                              break;
                    else:
                         continue; 
-                print(f"{arg}: not found");    
+                not found_arg and print(f"{arg}: not found");    
         else:    
             print(f"{command}: command not found");
     
