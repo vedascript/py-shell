@@ -23,6 +23,7 @@ def main():
                 print(f"{arg} is a shell builtin");
             else:
                 PATH =  os.environ["PATH"]; 
+                print(f"PATH: {PATH}")
                 dir_path_array = PATH.split(os.pathsep);
                 print(f"dir_path_aray {dir_path_array}")
                 found_arg = False;
