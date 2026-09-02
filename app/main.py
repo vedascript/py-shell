@@ -16,6 +16,12 @@ def main():
             break;
         elif(command == "echo"):
             print(" ".join(command_args));
+        elif(command == "type"):
+            arg = "".join(command_args);
+            if(arg == 'type' or arg == 'exit' or arg == 'echo'):
+                print(f"{arg} is a shell builtin");
+            else:    
+                print(f"{arg}: not found");    
         else:    
             print(f"{command}: command not found");
     
