@@ -42,9 +42,8 @@ def main():
                 exec_config = is_command_executable(arg);   
                 if(exec_config['is_executable']):
                     print(f"{arg} is {exec_config['file_path']}");
-                    break;
-
-                print(f"{arg}: not found");    
+                else:
+                 print(f"{arg}: not found");    
         else:    
             exec_config = is_command_executable(command);
             if(exec_config['is_executable']):
