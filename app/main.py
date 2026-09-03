@@ -4,6 +4,7 @@ import os
 import subprocess
 
 builtin_commands = ["exit", "echo", "pwd", "type", "cd"];
+ 
 
 def is_command_executable(command_to_run):
     PATH =  os.environ["PATH"]; 
@@ -18,6 +19,16 @@ def is_command_executable(command_to_run):
            return {'is_executable':True, 'file_path': file_path};
 
     return {'is_executable':False, 'file_path': None};       
+
+def get_path_type(path):
+    if(path[0] == '/'):
+        return "absolute";
+    elif(path[0] == '~'):
+        return 'home_dir';    
+    elif(path[1] == '.'):
+        return "parent_dir";
+    else:
+        return "current_dir"     
 
 def main():
     is_shell_running = True;
@@ -40,12 +51,43 @@ def main():
             print(os.getcwd());  
 
         elif(command == "cd"):
-            absolute_path = command_args[0];
+            path_exists = False;
+            path = command_args[0];
+            path_type =  get_path_type(path);
 
-            if(os.path.exists(absolute_path)):
-                os.chdir(absolute_path);
-            else:
-                print(f"cd: {absolute_path}: No such file or directory")    
+            if(path_type == 'absolute' and os.path.exists(path) ):
+                os.chdir(path);
+
+            elif(path_type == 'current_dir'):
+                absolute_path = os.getcwd();
+                target_path = absolute_path + path[1:];
+
+                if(os.path.exists(path)):
+                     path_exists = True;
+                     os.chdir(target_path);
+
+            elif(path_type == 'parent_dir'):
+                absolute_path = os.getcwd();
+                path_arr = path.split('/');
+                navigate_back_dir_count = 0;
+
+                for item in path_arr:
+                    if(item == '..'):
+                        navigate_back_dir_count += 1;
+
+                shortened_path_arr = absolute_path.split('/')[:-navigate_back_dir_count];
+                updated_path = "/".join(shortened_path_arr);
+
+                if(os.path.exists(updated_path)):
+                    path_exists = True;
+                    os.chdir(updated_path)
+
+            elif(path_type == 'home_dir'):
+                home_env = os.getenv("HOME");    
+                path_exists = True;
+                os.chdir(home_env);   
+
+            not path_exists and print(f"cd: {path}: No such file or directory")    
 
         elif(command == "type"):
             arg = "".join(command_args);
