@@ -34,9 +34,12 @@ def main():
         elif(command == "echo"):
             print(" ".join(command_args));
 
+        elif(command == "pwd"):
+            print(os.getcwd());     
+
         elif(command == "type"):
             arg = "".join(command_args);
-            if(arg == 'type' or arg == 'exit' or arg == 'echo'):
+            if(arg == 'type' or arg == 'exit' or arg == 'echo' or arg == 'pwd'):
                 print(f"{arg} is a shell builtin");
             else:
                 exec_config = is_command_executable(arg);   
@@ -44,8 +47,7 @@ def main():
                     print(f"{arg} is {exec_config['file_path']}");
                 else:
                  print(f"{arg}: not found");  
-        elif(command == "pwd"):
-            print(os.getcwd());
+
         else:    
             exec_config = is_command_executable(command);
             if(exec_config['is_executable']):
