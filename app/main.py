@@ -55,7 +55,8 @@ def main():
             path = command_args[0];
             path_type =  get_path_type(path);
 
-            if(path_type == 'absolute' and os.path.exists(path) ):
+            if(path_type == 'absolute' and os.path.exists(path)):
+                path_exists = True;
                 os.chdir(path);
 
             elif(path_type == 'current_dir'):
