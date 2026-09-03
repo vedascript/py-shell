@@ -43,7 +43,9 @@ def main():
                 if(exec_config['is_executable']):
                     print(f"{arg} is {exec_config['file_path']}");
                 else:
-                 print(f"{arg}: not found");    
+                 print(f"{arg}: not found");  
+        elif(command == "pwd"):
+            print(os.getcwd());
         else:    
             exec_config = is_command_executable(command);
             if(exec_config['is_executable']):
