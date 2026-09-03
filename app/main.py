@@ -3,6 +3,8 @@ import sys
 import os
 import subprocess
 
+builtin_commands = ["exit", "echo", "pwd", "type", "cd"];
+
 def is_command_executable(command_to_run):
     PATH =  os.environ["PATH"]; 
     dir_path_array = PATH.split(os.pathsep);
@@ -35,11 +37,19 @@ def main():
             print(" ".join(command_args));
 
         elif(command == "pwd"):
-            print(os.getcwd());     
+            print(os.getcwd());  
+
+        elif(command == "cd"):
+            absolute_path = command_args[0];
+
+            if(os.path.exists(absolute_path)):
+                os.chdir(absolute_path);
+            else:
+                print(f"cd: {absolute_path}: No such file or directory")    
 
         elif(command == "type"):
             arg = "".join(command_args);
-            if(arg == 'type' or arg == 'exit' or arg == 'echo' or arg == 'pwd'):
+            if(arg in builtin_commands):
                 print(f"{arg} is a shell builtin");
             else:
                 exec_config = is_command_executable(arg);   
