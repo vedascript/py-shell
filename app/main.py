@@ -138,15 +138,15 @@ def main():
             print(f"isFile: {os.path.isfile(parsed_file_path_input)}")
             if(os.path.exists(parsed_file_path_input) and os.path.isfile(parsed_file_path_input)):
                 print("reading file")
-                with open(final_path) as file:
+                with open(parsed_file_path_input) as file:
                     content = file.read();
-                    # file_contents += content; 
-                    sys.stdout.write(content)   
+                    file_contents += content; 
+                    # sys.stdout.write(content)   
             else:
                 continue; 
 
-            sys.stdout.flush()
-        #   print(f"{file_contents}");       
+            # sys.stdout.flush()
+          print(f"{file_contents}");       
 
         else:    
             exec_config = is_command_executable(command);
