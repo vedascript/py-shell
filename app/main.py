@@ -3,7 +3,7 @@ import sys
 import os
 import subprocess
 
-builtin_commands = ["exit", "echo", "pwd", "type", "cd"];
+builtin_commands = ["exit", "echo", "pwd", "type", "cd", "cat"];
  
 
 def is_command_executable(command_to_run):
@@ -28,20 +28,8 @@ def get_path_type(path):
     elif(path[1] == '.'):
         return "parent_dir";
     else:
-        return "current_dir"   
-
-def does_single_quote_exist(string):
-    count_quote = 0;
-
-    for char in string:
-        if(char == "'"):
-            count_quote += 1;
-        if(count_quote == 2):
-            break;
-
-    return count_quote and True;         
+        return "current_dir"         
         
-
 
 def main():
     is_shell_running = True;
@@ -69,8 +57,6 @@ def main():
                         string_to_echo += ch;
                     else:
                         continue;        
-                # str = " ".join(input_str.replace(" ",''));
-                # string_to_echo = str;
             else:
                 string_to_echo = input_str.replace("'","");
 
@@ -128,6 +114,21 @@ def main():
                     print(f"{arg} is {exec_config['file_path']}");
                 else:
                  print(f"{arg}: not found");  
+
+        elif(command == "cat"):
+          file_contents = '';
+
+          for file_path in command_args:
+            final_path = os.getcwd() + file_path;
+
+            if(os.path.exists(final_path)):
+                with open(final_path) as file:
+                    content = file.read();
+                    file_contents += content;    
+            else:
+                continue; 
+
+          print(f"{file_contents}");       
 
         else:    
             exec_config = is_command_executable(command);
