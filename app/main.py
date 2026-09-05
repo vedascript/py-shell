@@ -121,7 +121,7 @@ def main():
           for file_path in command_args:
             final_path = os.getcwd() + file_path;
 
-            if(os.path.exists(final_path)):
+            if(os.path.exists(final_path) and not os.path.isfile(final_path)):
                 with open(final_path) as file:
                     content = file.read();
                     file_contents += content;    
