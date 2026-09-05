@@ -3,7 +3,7 @@ import sys
 import os
 import subprocess
 
-builtin_commands = ["exit", "echo", "pwd", "type", "cd", "cat"];
+builtin_commands = ["exit", "echo", "pwd", "type", "cd"];
  
 
 def is_command_executable(command_to_run):
