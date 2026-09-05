@@ -62,8 +62,15 @@ def main():
             string_to_echo = "";
 
             if(input_str.count("'") < 2):
-                str = input_str.replace(" ",'');
-                string_to_echo = str;
+                for i, ch in enumerate(input_str):
+                    if(not ch == " "):
+                        string_to_echo += ch;
+                    elif(ch == " " and i < input_str.__len__() - 1 and not input_str[i+1] == " "):
+                        string_to_echo += ch;
+                    else:
+                        continue;        
+                # str = " ".join(input_str.replace(" ",''));
+                # string_to_echo = str;
             else:
                 string_to_echo = input_str.replace("'","");
 
