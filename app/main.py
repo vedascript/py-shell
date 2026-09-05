@@ -123,8 +123,13 @@ def main():
 
         elif(command == "cat"):
           file_contents = '';
+          input_str = " ".join(command_args);
+          paths_arr = input_str.split("'");
 
-          for file_path_input in command_args:
+          for file_path_input in paths_arr:
+            if(not "'" in file_path_input):
+                continue;
+
             parsed_file_path_input = handle_input_string(file_path_input);
             final_path = os.getcwd() + parsed_file_path_input;
 
