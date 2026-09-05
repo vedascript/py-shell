@@ -28,7 +28,20 @@ def get_path_type(path):
     elif(path[1] == '.'):
         return "parent_dir";
     else:
-        return "current_dir"     
+        return "current_dir"   
+
+def does_single_quote_exist(string):
+    count_quote = 0;
+
+    for char in string:
+        if(char == "'"):
+            count_quote += 1;
+        if(count_quote == 2):
+            break;
+
+    return count_quote and True;         
+        
+
 
 def main():
     is_shell_running = True;
@@ -39,14 +52,22 @@ def main():
         user_input = input();
         command = user_input.split(' ')[0];
         command_args = user_input.split(' ')[1:];
-    
+      
         if(command == "exit"):
             is_shell_running = False;
             break;
 
         elif(command == "echo"):
-            print(" ".join(command_args));
+            input_str = " ".join(command_args);
+            string_to_echo = "";
 
+            if(input_str.count("'") < 2):
+                str = input_str.replace(" ",'');
+                string_to_echo = str;
+            else:
+                string_to_echo = input_str.replace("'","");
+
+            print(string_to_echo)
         elif(command == "pwd"):
             print(os.getcwd());  
 
