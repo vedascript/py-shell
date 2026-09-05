@@ -131,21 +131,14 @@ def main():
                 continue;
 
             parsed_file_path_input = handle_input_string(f"'{file_path_input}'");
-            print(f"parsed path: {parsed_file_path_input}")
-            final_path = os.getcwd() + parsed_file_path_input;
-            print(f"final+path: {final_path}")
-            print(f"does path exists: {os.path.exists(parsed_file_path_input)}")
-            print(f"isFile: {os.path.isfile(parsed_file_path_input)}")
+
             if(os.path.exists(parsed_file_path_input) and os.path.isfile(parsed_file_path_input)):
-                print("reading file")
                 with open(parsed_file_path_input) as file:
                     content = file.read();
-                    file_contents += content; 
-                    # sys.stdout.write(content)   
+                    file_contents += content;   
             else:
                 continue; 
 
-            # sys.stdout.flush()
           print(f"{file_contents}");       
 
         else:    
