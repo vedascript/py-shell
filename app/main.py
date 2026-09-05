@@ -133,6 +133,7 @@ def main():
             parsed_file_path_input = handle_input_string(file_path_input);
             final_path = os.getcwd() + parsed_file_path_input;
             if(os.path.exists(final_path) and os.path.isfile(final_path)):
+                print("reading file")
                 with open(final_path) as file:
                     content = file.read();
                     file_contents += content;    
