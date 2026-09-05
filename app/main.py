@@ -130,7 +130,7 @@ def main():
             if(not file_path_input.strip()):
                 continue;
 
-            parsed_file_path_input = handle_input_string(file_path_input);
+            parsed_file_path_input = handle_input_string(f"'{file_path_input}'");
             print(f"parsed path: {parsed_file_path_input}")
             final_path = os.getcwd() + parsed_file_path_input;
             if(os.path.exists(final_path) and os.path.isfile(final_path)):
