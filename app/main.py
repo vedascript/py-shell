@@ -28,7 +28,24 @@ def get_path_type(path):
     elif(path[1] == '.'):
         return "parent_dir";
     else:
-        return "current_dir"         
+        return "current_dir"   
+
+def handle_input_string(input_str):
+    parsed_input_str = "";
+
+    if(input_str.count("'") < 2):
+        for i, ch in enumerate(input_str):
+            if(not ch == " "):
+                parsed_input_str += ch;
+            elif(ch == " " and i < input_str.__len__() - 1 and not input_str[i+1] == " "):
+                    parsed_input_str += ch;
+            else:
+                    continue;        
+    else:
+        parsed_input_str = input_str.replace("'","");
+
+    return parsed_input_str;    
+
         
 
 def main():
@@ -47,20 +64,9 @@ def main():
 
         elif(command == "echo"):
             input_str = " ".join(command_args);
-            string_to_echo = "";
+            string_to_echo = handle_input_string(input_str);
 
-            if(input_str.count("'") < 2):
-                for i, ch in enumerate(input_str):
-                    if(not ch == " "):
-                        string_to_echo += ch;
-                    elif(ch == " " and i < input_str.__len__() - 1 and not input_str[i+1] == " "):
-                        string_to_echo += ch;
-                    else:
-                        continue;        
-            else:
-                string_to_echo = input_str.replace("'","");
-
-            print(string_to_echo)
+            print(string_to_echo);
         elif(command == "pwd"):
             print(os.getcwd());  
 
@@ -118,8 +124,9 @@ def main():
         elif(command == "cat"):
           file_contents = '';
 
-          for file_path in command_args:
-            final_path = os.getcwd() + file_path;
+          for file_path_input in command_args:
+            parsed_file_path_input = handle_input_string(file_path_input);
+            final_path = os.getcwd() + parsed_file_path_input;
 
             if(os.path.exists(final_path) and os.path.isfile(final_path)):
                 with open(final_path) as file:
