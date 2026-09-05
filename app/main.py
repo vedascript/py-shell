@@ -140,11 +140,13 @@ def main():
                 print("reading file")
                 with open(final_path) as file:
                     content = file.read();
-                    file_contents += content;    
+                    # file_contents += content; 
+                    sys.stdout.write(content)   
             else:
                 continue; 
 
-          print(f"{file_contents}");       
+            sys.stdout.flush()
+        #   print(f"{file_contents}");       
 
         else:    
             exec_config = is_command_executable(command);
