@@ -139,7 +139,7 @@ def main():
             else:
                 continue; 
 
-          print(f"{file_contents}");       
+          sys.stdout.write(f"{file_contents}");       
 
         else:    
             exec_config = is_command_executable(command);
