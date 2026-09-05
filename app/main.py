@@ -125,7 +125,6 @@ def main():
           file_contents = '';
           input_str = " ".join(command_args);
           paths_arr = input_str.split("'");
-          print(f"input_str:{paths_arr}")
 
           for file_path_input in paths_arr:
             if(not file_path_input.strip()):
