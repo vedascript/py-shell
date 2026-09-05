@@ -125,14 +125,14 @@ def main():
           file_contents = '';
           input_str = " ".join(command_args);
           paths_arr = input_str.split("'");
+          print(f"input_str:{paths_arr}")
 
           for file_path_input in paths_arr:
-            if(not "'" in file_path_input):
+            if(not file_path_input.strip()):
                 continue;
 
             parsed_file_path_input = handle_input_string(file_path_input);
             final_path = os.getcwd() + parsed_file_path_input;
-
             if(os.path.exists(final_path) and os.path.isfile(final_path)):
                 with open(final_path) as file:
                     content = file.read();
