@@ -30,13 +30,22 @@ def get_path_type(path):
     else:
         return "current_dir"   
 
-def parse_input_str(input_str):
+def parse_input_str(input_str, get_str_arr = False):
     if('"' in input_str):
         str_arr = input_str.split('"');
+        
+        if(get_str_arr):
+            return str_arr;
+
         parsed_str = handle_double_quotes_str(str_arr);
     else:
         str_arr = input_str.split("'"); 
+
+        if(get_str_arr):
+            return str_arr;
+
         parsed_str =  handle_single_quote_str(str_arr)
+
     return parsed_str;     
 
 def handle_double_quotes_str(str_arr):
@@ -138,13 +147,12 @@ def main():
         elif(command == "cat"):
           file_contents = '';
           input_str = " ".join(command_args);
-          parsed_input_str = parse_input_str(input_str);
-          paths_arr = parsed_input_str.split(" ");
-
-          for file_path_input in paths_arr:
+          parsed_input_arr = parse_input_str(input_str, True);
+       
+          for file_path_input in parsed_input_arr:
             if(not file_path_input.strip()):
                 continue;
-                         
+
             if(os.path.exists(file_path_input) and os.path.isfile(file_path_input)):
                 with open(file_path_input) as file:
                     content = file.read();
