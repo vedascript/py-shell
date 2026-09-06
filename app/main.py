@@ -68,7 +68,7 @@ def handle_single_quote_str(str_arr):
     for str in str_arr:
     #     parsed_input_str += " ".join(str.split());
     #     parsed_input_str.strip();
-        parsed_input_str += str;
+        parsed_input_str += ' '.join(str.split());
         parsed_input_str.replace("'","");
 
     return parsed_input_str;    
