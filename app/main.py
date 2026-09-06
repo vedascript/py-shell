@@ -30,16 +30,18 @@ def get_path_type(path):
     else:
         return "current_dir"   
 
-def split_input_str(input_str):
+def parse_input_str(input_str):
     if('"' in input_str):
         str_arr = input_str.split('"');
+        parsed_str = handle_double_quotes_str(str_arr);
     else:
         str_arr = input_str.split("'"); 
+        parsed_str =  handle_single_quote_str(str_arr)
+    return parsed_str;     
 
-    return str_arr;       
- 
-def handle_input_string(str_arr):
-    parsed_input_str = "";
+def handle_double_quotes_str(str_arr):
+    print("Double Quote Handling")
+    parsed_input_str = '';
 
     for str in str_arr:
         if(not str.strip() and len(str)):
@@ -50,7 +52,33 @@ def handle_input_string(str_arr):
         else:    
             parsed_input_str += str.strip();
 
+    return parsed_input_str;
+
+def handle_single_quote_str(str_arr):
+    parsed_input_str = '';
+
+    for str in str_arr:
+        parsed_input_str += " ".join(str.split());
+        parsed_input_str.replace("'","");
+
     return parsed_input_str;    
+
+ 
+# def handle_input_string(str_arr):
+#     parsed_input_str = "";
+#     print(f"str_arr {str_arr}")
+#     for str in str_arr:
+#         print(f"for str {str}")
+#         if(len(str) and str[0] == '"'):
+#             resolved_str = handle_double_quotes_str(str);
+#             parsed_input_str += resolved_str;
+#         elif(len(str) and str[0] == "'"):
+#             resolved_str = handle_single_quote_str(str);
+#             parsed_input_str += resolved_str;
+#         else:
+#             continue    
+
+#     return parsed_input_str;    
 
 
 def main():
@@ -69,10 +97,10 @@ def main():
 
         elif(command == "echo"):
             input_str = " ".join(command_args);
-            str_arr = split_input_str(input_str);
-            string_to_echo = handle_input_string(str_arr);
+            parsed_input_str = parse_input_str(input_str);
+            # string_to_echo = handle_input_string(str_arr);
 
-            print(string_to_echo);
+            print(parsed_input_str);
         elif(command == "pwd"):
             print(os.getcwd());  
 
@@ -130,16 +158,17 @@ def main():
         elif(command == "cat"):
           file_contents = '';
           input_str = " ".join(command_args);
-          paths_arr = split_input_str(input_str);
-      
+          parsed_input_str = parse_input_str(input_str);
+          paths_arr = parsed_input_str.split(" ");
+
           for file_path_input in paths_arr:
             if(not file_path_input.strip()):
                 continue;
 
-            parsed_file_path_input = handle_input_string(file_path_input);
+            # parsed_file_path_input = handle_input_string(file_path_input);
          
-            if(os.path.exists(parsed_file_path_input) and os.path.isfile(parsed_file_path_input)):
-                with open(parsed_file_path_input) as file:
+            if(os.path.exists(file_path_input) and os.path.isfile(file_path_input)):
+                with open(file_path_input) as file:
                     content = file.read();
                     file_contents += content;   
             else:
