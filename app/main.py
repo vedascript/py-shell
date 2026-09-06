@@ -71,7 +71,7 @@ def main():
             input_str = " ".join(command_args);
             str_arr = split_input_str(input_str);
             string_to_echo = handle_input_string(str_arr);
-            
+
             print(string_to_echo);
         elif(command == "pwd"):
             print(os.getcwd());  
@@ -131,14 +131,13 @@ def main():
           file_contents = '';
           input_str = " ".join(command_args);
           paths_arr = split_input_str(input_str);
-          print(f"paaths arr {paths_arr}");  
+      
           for file_path_input in paths_arr:
             if(not file_path_input.strip()):
                 continue;
 
             parsed_file_path_input = handle_input_string(file_path_input);
-            print(f"parsed_input: {parsed_file_path_input}")
-
+         
             if(os.path.exists(parsed_file_path_input) and os.path.isfile(parsed_file_path_input)):
                 with open(parsed_file_path_input) as file:
                     content = file.read();
