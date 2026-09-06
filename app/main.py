@@ -64,14 +64,19 @@ def handle_double_quotes_str(str_arr):
 
 def handle_single_quote_str(str_arr):
     parsed_input_str = '';
-
     for str in str_arr:
     #     parsed_input_str += " ".join(str.split());
     #     parsed_input_str.strip();
-        parsed_input_str += ' '.join(str.split());
-        parsed_input_str.replace("'","");
-
-    return parsed_input_str;    
+        if(str == " "):
+            parsed_input_str += " ";
+        elif(len(str) and str[0] == " "):
+            parsed_input_str += str;
+        elif(len(str) and str[len(str)-1] == " "):
+            parsed_input_str += str;
+        else:
+            parsed_input_str += ' '.join(str.split());
+        
+    return parsed_input_str.replace("'","");   
 
 
 def main():
