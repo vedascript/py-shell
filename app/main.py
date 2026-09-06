@@ -65,10 +65,10 @@ def handle_double_quotes_str(str_arr):
 def handle_single_quote_str(str_arr):
     parsed_input_str = '';
 
-    for str in str_arr:
-        parsed_input_str += " ".join(str.split()) + " ";
-        parsed_input_str.strip();
-        parsed_input_str.replace("'","");
+    # for str in str_arr:
+    #     parsed_input_str += " ".join(str.split());
+    #     parsed_input_str.strip();
+    parsed_input_str.replace("'","");
 
     return parsed_input_str;    
 
