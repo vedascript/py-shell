@@ -30,23 +30,34 @@ def get_path_type(path):
     else:
         return "current_dir"   
 
+# parse through the array
+# discard empty string/items
+
+# def handle_input_string(input_str):
+#     parsed_input_str = "";
+#     print(f"arr: {input_str.split('"')}");
+#     if(input_str.count("'") < 2):
+#         for i, ch in enumerate(input_str):
+#             if(not ch == " "):
+#                 parsed_input_str += ch;
+#             elif(ch == " " and i < input_str.__len__() - 1 and not input_str[i+1] == " "):
+#                 parsed_input_str += ch;
+#             else:
+#                 continue;        
+#     else:
+#         parsed_input_str = input_str.replace("'","");
+
+#     return parsed_input_str;    
+
 def handle_input_string(input_str):
     parsed_input_str = "";
+    str_arr = input_str.split('"');
 
-    if(input_str.count("'") < 2):
-        for i, ch in enumerate(input_str):
-            if(not ch == " "):
-                parsed_input_str += ch;
-            elif(ch == " " and i < input_str.__len__() - 1 and not input_str[i+1] == " "):
-                    parsed_input_str += ch;
-            else:
-                    continue;        
-    else:
-        parsed_input_str = input_str.replace("'","");
-
+    for str in str_arr:
+        parsed_input_str += str
+              
     return parsed_input_str;    
 
-        
 
 def main():
     is_shell_running = True;
@@ -66,7 +77,7 @@ def main():
             input_str = " ".join(command_args);
             string_to_echo = handle_input_string(input_str);
 
-            print(string_to_echo);
+            # print(string_to_echo);
         elif(command == "pwd"):
             print(os.getcwd());  
 
