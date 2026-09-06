@@ -64,17 +64,21 @@ def handle_double_quotes_str(str_arr):
 
 def handle_single_quote_str(str_arr):
     parsed_input_str = '';
+    is_empty_quoted_str = len(str_arr) and not str_arr[0] == '';
+
     for str in str_arr:
-    #     parsed_input_str += " ".join(str.split());
-    #     parsed_input_str.strip();
         if(str == " "):
             parsed_input_str += " ";
+        elif(str.count("'") >= 2):
+            parsed_input_str += str;    
         elif(len(str) and str[0] == " "):
             parsed_input_str += str;
         elif(len(str) and str[len(str)-1] == " "):
             parsed_input_str += str;
-        else:
+        elif(is_empty_quoted_str):
             parsed_input_str += ' '.join(str.split());
+        else:
+            parsed_input_str += str    
         
     return parsed_input_str.replace("'","");   
 
