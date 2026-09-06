@@ -52,7 +52,7 @@ def get_path_type(path):
 def handle_input_string(input_str):
     parsed_input_str = "";
     str_arr = input_str.split('"');
-    print(f'str_arr {str_arr}')
+
     for str in str_arr:
         if(not str.strip() and len(str)):
             parsed_input_str += " ";
