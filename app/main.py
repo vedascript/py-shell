@@ -63,7 +63,7 @@ def handle_input_string(input_str):
             striped_str = str.lstrip();
             parsed_input_str+= f'{" " + striped_str}'    
         else:    
-            parsed_input_str += str.lstrip();
+            parsed_input_str += str.strip();
 
     return parsed_input_str;    
 
