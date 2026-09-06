@@ -30,31 +30,16 @@ def get_path_type(path):
     else:
         return "current_dir"   
 
-# parse through the array
-# discard empty string/items
-
-# def handle_input_string(input_str):
-#     parsed_input_str = "";
-#     print(f"arr: {input_str.split('"')}");
-#     if(input_str.count("'") < 2):
-#         for i, ch in enumerate(input_str):
-#             if(not ch == " "):
-#                 parsed_input_str += ch;
-#             elif(ch == " " and i < input_str.__len__() - 1 and not input_str[i+1] == " "):
-#                 parsed_input_str += ch;
-#             else:
-#                 continue;        
-#     else:
-#         parsed_input_str = input_str.replace("'","");
-
-#     return parsed_input_str;    
-
-def handle_input_string(input_str):
-    parsed_input_str = "";
+def split_input_str(input_str):
     if('"' in input_str):
         str_arr = input_str.split('"');
     else:
-        str_arr = input_str.split("'");
+        str_arr = input_str.split("'"); 
+
+    return str_arr;       
+ 
+def handle_input_string(str_arr):
+    parsed_input_str = "";
 
     for str in str_arr:
         if(not str.strip() and len(str)):
@@ -84,8 +69,9 @@ def main():
 
         elif(command == "echo"):
             input_str = " ".join(command_args);
-            string_to_echo = handle_input_string(input_str);
-
+            str_arr = split_input_str(input_str);
+            string_to_echo = handle_input_string(str_arr);
+            
             print(string_to_echo);
         elif(command == "pwd"):
             print(os.getcwd());  
@@ -144,14 +130,15 @@ def main():
         elif(command == "cat"):
           file_contents = '';
           input_str = " ".join(command_args);
-          paths_arr = input_str.split('"');
-
+          paths_arr = split_input_str(input_str);
+          print(f"paaths arr {paths_arr}");  
           for file_path_input in paths_arr:
             if(not file_path_input.strip()):
                 continue;
 
             parsed_file_path_input = handle_input_string(file_path_input);
-    
+            print(f"parsed_input: {parsed_file_path_input}")
+
             if(os.path.exists(parsed_file_path_input) and os.path.isfile(parsed_file_path_input)):
                 with open(parsed_file_path_input) as file:
                     content = file.read();
