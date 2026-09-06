@@ -77,7 +77,7 @@ def main():
             input_str = " ".join(command_args);
             string_to_echo = handle_input_string(input_str);
 
-            # print(string_to_echo);
+            print(string_to_echo);
         elif(command == "pwd"):
             print(os.getcwd());  
 
