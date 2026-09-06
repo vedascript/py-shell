@@ -40,7 +40,6 @@ def parse_input_str(input_str):
     return parsed_str;     
 
 def handle_double_quotes_str(str_arr):
-    print("Double Quote Handling")
     parsed_input_str = '';
 
     for str in str_arr:
@@ -63,23 +62,6 @@ def handle_single_quote_str(str_arr):
 
     return parsed_input_str;    
 
- 
-# def handle_input_string(str_arr):
-#     parsed_input_str = "";
-#     print(f"str_arr {str_arr}")
-#     for str in str_arr:
-#         print(f"for str {str}")
-#         if(len(str) and str[0] == '"'):
-#             resolved_str = handle_double_quotes_str(str);
-#             parsed_input_str += resolved_str;
-#         elif(len(str) and str[0] == "'"):
-#             resolved_str = handle_single_quote_str(str);
-#             parsed_input_str += resolved_str;
-#         else:
-#             continue    
-
-#     return parsed_input_str;    
-
 
 def main():
     is_shell_running = True;
@@ -98,8 +80,6 @@ def main():
         elif(command == "echo"):
             input_str = " ".join(command_args);
             parsed_input_str = parse_input_str(input_str);
-            # string_to_echo = handle_input_string(str_arr);
-
             print(parsed_input_str);
         elif(command == "pwd"):
             print(os.getcwd());  
@@ -164,9 +144,7 @@ def main():
           for file_path_input in paths_arr:
             if(not file_path_input.strip()):
                 continue;
-
-            # parsed_file_path_input = handle_input_string(file_path_input);
-         
+                         
             if(os.path.exists(file_path_input) and os.path.isfile(file_path_input)):
                 with open(file_path_input) as file:
                     content = file.read();
