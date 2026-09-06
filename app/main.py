@@ -56,8 +56,11 @@ def handle_input_string(input_str):
     for str in str_arr:
         if(not str.strip() and len(str)):
             parsed_input_str += " ";
+        if(str[0] == " "):
+            striped_str = str.lstrip();
+            parsed_input_str+= f'{" " + striped_str}'    
         else:    
-            parsed_input_str += str
+            parsed_input_str += str.lstrip();
 
     return parsed_input_str;    
 
