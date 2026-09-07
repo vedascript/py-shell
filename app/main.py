@@ -76,25 +76,49 @@ def handle_single_quote_str(str_arr):
         elif(len(str) and str[len(str)-1] == " "):
             parsed_input_str += str;
         elif(is_empty_quoted_str):
+            # print(f"split arr: {str.split("\\")}")
             parsed_input_str += ' '.join(str.split());
         else:
             parsed_input_str += str    
         
     return parsed_input_str.replace("'","");   
 
-#test\nexample\ 
-def parse_back_ticks(input_str):
+def get_single_quotes_occurrence_after_backticks(input_str):
+    print(f"input str: {input_str}")
+    back_ticks_count = 0;
+    back_ticks_before_quote = [];
+
+    for index, char in enumerate(input_str):
+        char = input_str[index];
+        if(not index == len(input_str) - 1 and char=="\\" and input_str[index + 1] == "'"):
+            back_ticks_count += 1;
+            back_ticks_before_quote.append(back_ticks_count);    
+        elif(char == '\\'):
+            back_ticks_count += 1;   
+
+    return back_ticks_before_quote;            
+
+def parse_back_ticks(input_str, back_ticks_before_quotes):
     parsed_str = "";
     index = 0;
+    back_ticks_count = 0;
 
     while index < len(input_str):
         char = input_str[index];
 
         if(char == "\\"):
-            if(index == len(input_str) - 1):
-                continue;    
-            parsed_str+= input_str[index + 1];
-            index += 2;
+            back_ticks_count += 1;
+
+            if(back_ticks_count in back_ticks_before_quotes):
+                char = input_str[index + 1] if not index == len(input_str) - 1 else ''; 
+                parsed_str +=  f"'{char}"
+                index += 2;
+            elif(index == len(input_str) - 1):
+                index += 1;
+                continue; 
+            else:          
+                parsed_str += input_str[index + 1];
+                index += 2;
         else:
             parsed_str += char;  
             index +=1;  
@@ -117,10 +141,12 @@ def main():
 
         elif(command == "echo"):
             input_str = " ".join(command_args);
-            back_ticks_parsed_str = parse_back_ticks(input_str)
-            parsed_input_str = parse_input_str(back_ticks_parsed_str);
-            # parsed_input_str = parse_input_str(input_str);
-            print(parsed_input_str);
+            # back_ticks_parsed_str = parse_back_ticks(input_str)
+            # parsed_input_str = parse_input_str(back_ticks_parsed_str);
+            back_ticks_before_quotes = get_single_quotes_occurrence_after_backticks(input_str);
+            parsed_input_str = parse_input_str(input_str);
+            back_ticks_parsed_str = parse_back_ticks(parsed_input_str, back_ticks_before_quotes);
+            print(back_ticks_parsed_str);
         elif(command == "pwd"):
             print(os.getcwd());  
 
@@ -178,10 +204,11 @@ def main():
         elif(command == "cat"):
           file_contents = '';
           input_str = " ".join(command_args);
-          back_ticks_parsed_str = parse_back_ticks(input_str)
-          parsed_input_arr = parse_input_str(back_ticks_parsed_str, True);
+          back_ticks_before_quotes = get_single_quotes_occurrence_after_backticks(input_str);
+          parsed_input_arr = parse_input_str(input_str, True);
+          back_ticks_parsed_str = parse_back_ticks(parsed_input_arr, back_ticks_before_quotes)
        
-          for file_path_input in parsed_input_arr:
+          for file_path_input in back_ticks_parsed_str:
             if(not file_path_input.strip()):
                 continue;
 
