@@ -82,6 +82,24 @@ def handle_single_quote_str(str_arr):
         
     return parsed_input_str.replace("'","");   
 
+#test\nexample\ 
+def parse_back_ticks(input_str):
+    parsed_str = "";
+    index = 0;
+
+    while index < len(input_str):
+        char = input_str[index];
+
+        if(char == "\\"):
+            if(index == len(input_str) - 1):
+                continue;    
+            parsed_str+= input_str[index + 1];
+            index += 2;
+        else:
+            parsed_str += char;  
+            index +=1;  
+
+    return parsed_str;
 
 def main():
     is_shell_running = True;
@@ -99,7 +117,9 @@ def main():
 
         elif(command == "echo"):
             input_str = " ".join(command_args);
-            parsed_input_str = parse_input_str(input_str);
+            back_ticks_parsed_str = parse_back_ticks(input_str)
+            parsed_input_str = parse_input_str(back_ticks_parsed_str);
+            # parsed_input_str = parse_input_str(input_str);
             print(parsed_input_str);
         elif(command == "pwd"):
             print(os.getcwd());  
@@ -158,7 +178,8 @@ def main():
         elif(command == "cat"):
           file_contents = '';
           input_str = " ".join(command_args);
-          parsed_input_arr = parse_input_str(input_str, True);
+          back_ticks_parsed_str = parse_back_ticks(input_str)
+          parsed_input_arr = parse_input_str(back_ticks_parsed_str, True);
        
           for file_path_input in parsed_input_arr:
             if(not file_path_input.strip()):
