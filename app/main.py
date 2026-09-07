@@ -84,7 +84,6 @@ def handle_single_quote_str(str_arr):
     return parsed_input_str.replace("'","");   
 
 def get_single_quotes_occurrence_after_backticks(input_str):
-    print(f"input str: {input_str}")
     back_ticks_count = 0;
     back_ticks_before_quote = [];
 
