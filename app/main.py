@@ -41,8 +41,10 @@ def parse_input_str(input_str, get_str_arr = False):
     else:
         str_arr = input_str.split("'"); 
 
-        if(get_str_arr):
+        if(get_str_arr and "'" in input_str):
             return str_arr;
+        elif(get_str_arr):
+            return input_str.split(" ");    
 
         parsed_str =  handle_single_quote_str(str_arr)
 
@@ -248,12 +250,12 @@ def main():
         elif(command == "cat"):
           file_contents = '';
           input_str = " ".join(command_args);
-        #   parsed_input_arr = parse_input_str(input_str, True);
+          parsed_input_arr = parse_input_str(input_str, True);
          
-          for file_path_input in command_args:
+          for file_path_input in parsed_input_arr:
             back_slash_chars = track_back_slash_chars(file_path_input);
             back_slash_parsed_file_path = parse_back_slash_str(file_path_input, back_slash_chars);
-
+           
             if(not back_slash_parsed_file_path.strip()):
                 continue;
 
