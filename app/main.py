@@ -154,15 +154,16 @@ def parse_back_slash_str(input_str, back_slash_char_arr):
         if(char == "\\" and not index == len(input_str) - 1):
             back_slash_char = back_slash_char_arr.pop(0);
             parsed_str += back_slash_char; 
+            next_char_in_str = input_str[index + 1];
 
-            if(back_slash_char == "'" or back_slash_char == '"'):
+            if((back_slash_char == "'" or back_slash_char == '"' ) and not next_char_in_str == back_slash_char):
                 index += 1;
             else:    
                 index += 2;
         else:
             parsed_str += char;
             index += 1;
-
+    # print(f"len: {len(back_slash_char_arr)}")
     if(len(back_slash_char_arr)):
        parsed_str = parsed_str[:-1];
        parsed_str += back_slash_char_arr.pop(0);         
@@ -187,7 +188,9 @@ def main():
         elif(command == "echo"):
             input_str = " ".join(command_args);
             back_slash_chars = track_back_slash_chars(input_str);
+            # print(f"char arr: {back_slash_chars}");
             parsed_input_str = parse_input_str(input_str);
+            # print(f"parsed_input_str: {parsed_input_str}")
             back_ticks_parsed_str = parse_back_slash_str(parsed_input_str, back_slash_chars);
             print(back_ticks_parsed_str);
         elif(command == "pwd"):
