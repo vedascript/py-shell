@@ -188,9 +188,7 @@ def main():
         elif(command == "echo"):
             input_str = " ".join(command_args);
             back_slash_chars = track_back_slash_chars(input_str);
-            # print(f"char arr: {back_slash_chars}");
             parsed_input_str = parse_input_str(input_str);
-            # print(f"parsed_input_str: {parsed_input_str}")
             back_ticks_parsed_str = parse_back_slash_str(parsed_input_str, back_slash_chars);
             print(back_ticks_parsed_str);
         elif(command == "pwd"):
@@ -250,10 +248,9 @@ def main():
         elif(command == "cat"):
           file_contents = '';
           input_str = " ".join(command_args);
-          parsed_input_arr = parse_input_str(input_str, True);
-
-       
-          for file_path_input in parsed_input_arr:
+        #   parsed_input_arr = parse_input_str(input_str, True);
+         
+          for file_path_input in command_args:
             back_slash_chars = track_back_slash_chars(file_path_input);
             back_slash_parsed_file_path = parse_back_slash_str(file_path_input, back_slash_chars);
 
