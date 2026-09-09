@@ -31,7 +31,9 @@ def get_path_type(path):
         return "current_dir"   
 
 def parse_input_str(input_str, get_str_arr = False):
-    if('"' in input_str):
+    is_single_quotes_str = input_str[0] == "'" and input_str[len(input_str) - 1] == "'";
+
+    if(not is_single_quotes_str):
         str_arr = input_str.split('"');
         
         if(get_str_arr):
@@ -46,37 +48,10 @@ def parse_input_str(input_str, get_str_arr = False):
         elif(get_str_arr):
             return input_str.split(" ");    
 
-        parsed_str =  handle_single_quote_str(str_arr)
+        parsed_str = handle_single_quote_str(str_arr)
 
-    return parsed_str;     
+    return parsed_str;   
 
-def handle_double_quotes_str(str_arr):
-    parsed_input_str = '';
-
-    for str in str_arr:
-        if(not str.strip() and len(str)):
-            parsed_input_str += " ";
-        elif(len(str) and str[0] == " "):
-            striped_str = str.lstrip();
-            parsed_input_str+= f'{" " + striped_str}'    
-        else:    
-            parsed_input_str += str.strip();
-
-    return parsed_input_str;
-
-def track_back_slash_chars(input_str):
-    back_slash_chars = [];
-    index = 0;
-
-    while(index < len(input_str)):
-        char = input_str[index];
-        if(char == "\\" and not index == len(input_str) - 1):
-            back_slash_chars.append(input_str[index + 1]);
-            index += 2
-        else:
-            index += 1;    
-
-    return back_slash_chars;        
 
 def handle_single_quote_str(str_arr):
     parsed_input_str = '';
@@ -92,12 +67,45 @@ def handle_single_quote_str(str_arr):
         elif(len(str) and str[len(str)-1] == " "):
             parsed_input_str += str;
         elif(is_empty_quoted_str):
-            # print(f"split arr: {str.split("\\")}")
             parsed_input_str += ' '.join(str.split());
         else:
             parsed_input_str += str    
         
-    return parsed_input_str.replace("'","");   
+    return parsed_input_str.replace("'","");         
+
+def handle_double_quotes_str(str_arr):
+    parsed_input_str = '';
+   
+    for str in str_arr:
+        if(not str.strip() and len(str)):
+            parsed_input_str += " ";
+        elif(len(str) and str[0] == " "):
+            striped_str = str.lstrip();
+            parsed_input_str+= f'{" " + striped_str}'    
+        else:    
+            parsed_input_str += str.strip();
+
+    return parsed_input_str;
+
+def track_back_slash_chars(input_str):
+    back_slash_chars = [];
+    index = 0;
+    is_str_wrapped_in_single_quotes = input_str[0] == "'" and input_str[len(input_str) - 1] == "'";
+
+    if(is_str_wrapped_in_single_quotes):
+        return [];
+
+    while(index < len(input_str)):
+        char = input_str[index];
+        if(char == "\\" and not index == len(input_str) - 1):
+            back_slash_chars.append(input_str[index + 1]);
+            index += 2
+        else:
+            index += 1;    
+
+    return back_slash_chars;        
+
+
 
 
     back_ticks_count = 0;
@@ -113,42 +121,12 @@ def handle_single_quote_str(str_arr):
 
     return back_ticks_before_quote;            
 
-# def parse_back_ticks(input_str, back_ticks_before_quotes):
-
-
-#     parsed_str = "";
-#     index = 0;
-#     back_ticks_count = 0;
-
-#     while index < len(input_str):
-#         char = input_str[index];
-
-#         if(char == "\\"):
-#             back_ticks_count += 1;
-
-#             if(back_ticks_count in back_ticks_before_quotes):
-#                 char = input_str[index + 1] if not index == len(input_str) - 1 else ''; 
-#                 parsed_str +=  f"'{char}"
-#                 index += 2;
-#             elif(index == len(input_str) - 1):
-#                 index += 1;
-#                 continue; 
-#             else:          
-#                 parsed_str += input_str[index + 1];
-#                 index += 2;
-#         else:
-#             parsed_str += char;  
-#             index +=1;  
-
-#     return parsed_str;
-
-
-# then pare over the parsed_str and if back-slash is found replace that with the array appropriate element
-# then do index+=2 on top of parsed_str.
-
 def parse_back_slash_str(input_str, back_slash_char_arr):
     index = 0;
     parsed_str = "";
+
+    if(not len(back_slash_char_arr)):
+        return input_str;
 
     while(index < len(input_str)):
         char = input_str[index];
@@ -165,7 +143,7 @@ def parse_back_slash_str(input_str, back_slash_char_arr):
         else:
             parsed_str += char;
             index += 1;
-    # print(f"len: {len(back_slash_char_arr)}")
+
     if(len(back_slash_char_arr)):
        parsed_str = parsed_str[:-1];
        parsed_str += back_slash_char_arr.pop(0);         
@@ -192,6 +170,7 @@ def main():
             back_slash_chars = track_back_slash_chars(input_str);
             parsed_input_str = parse_input_str(input_str);
             back_ticks_parsed_str = parse_back_slash_str(parsed_input_str, back_slash_chars);
+
             print(back_ticks_parsed_str);
         elif(command == "pwd"):
             print(os.getcwd());  
