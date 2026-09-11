@@ -265,7 +265,6 @@ def main():
           file_contents = '';
           input_str = " ".join(command_args);
           cat_str_arr = get_cat_string_arr(input_str);
-          print(f"cat_str_arr: {cat_str_arr}") 
           
           for file_path_input in cat_str_arr:
             back_slash_chars = track_back_slash_chars(file_path_input);
