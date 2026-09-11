@@ -149,6 +149,10 @@ def parse_back_slash_str(input_str, back_slash_char_arr):
 # keep adding chars until char == " ' "
 # then state=> normal , add that string to [] wrapped in single quotes.
 
+# state => normal and char == '"' then state => double
+# keep adding chars until char == '"' then append it 
+# state => normal , parsed-str = "";
+
 def get_cat_string_arr(input_str):
     cat_str_arr = [];
     index = 0;
@@ -163,7 +167,9 @@ def get_cat_string_arr(input_str):
                 cat_str_arr.append(parsed_str);
                 parsed_str = "";
             elif(char == "'"):
-                state = "single_quote";    
+                state = "single_quote";  
+            elif(char == '"'):
+                state = "double_quote";         
             else:
                 parsed_str += char;
 
@@ -174,7 +180,16 @@ def get_cat_string_arr(input_str):
                 parsed_str = "";
                 state = "normal";
             else:
-                parsed_str += char    
+                parsed_str += char 
+
+        elif(state == 'double_quote'):
+            #end of double quote
+            if(char == '"'):
+                cat_str_arr.append(f'"{parsed_str}');
+                parsed_str = "";
+                state = "normal";
+            else:
+                parsed_str += char               
 
         index += 1;  
 
@@ -265,13 +280,11 @@ def main():
           file_contents = '';
           input_str = " ".join(command_args);
           cat_str_arr = get_cat_string_arr(input_str);
-        
 
           for file_path_input in cat_str_arr:
             back_slash_chars = track_back_slash_chars(file_path_input);
             parsed_input_str = parse_input_str(file_path_input);
             back_slash_parsed_file_path = parse_back_slash_str(parsed_input_str, back_slash_chars);
-        
 
             if(not back_slash_parsed_file_path.strip()):
                 continue;
