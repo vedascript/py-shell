@@ -1,4 +1,6 @@
 
+from re import L
+import stat
 import sys
 import os
 import subprocess
@@ -30,27 +32,18 @@ def get_path_type(path):
     else:
         return "current_dir"   
 
-def parse_input_str(input_str, get_str_arr = False):
+def parse_input_str(input_str):
     is_single_quotes_str = input_str[0] == "'" and input_str[len(input_str) - 1] == "'";
 
     if(not is_single_quotes_str):
         str_arr = input_str.split('"');
-        
-        if(get_str_arr):
-            return str_arr;
-
         parsed_str = handle_double_quotes_str(str_arr);
     else:
-        str_arr = input_str.split("'"); 
-
-        if(get_str_arr and "'" in input_str):
-            return str_arr;
-        elif(get_str_arr):
-            return input_str.split(" ");    
-
+        str_arr = input_str.split("'");  
         parsed_str = handle_single_quote_str(str_arr)
 
-    return parsed_str;   
+    return parsed_str;  
+
 
 
 def handle_single_quote_str(str_arr):
@@ -90,7 +83,7 @@ def handle_double_quotes_str(str_arr):
 def track_back_slash_chars(input_str):
     back_slash_chars = [];
     index = 0;
-    is_str_wrapped_in_single_quotes = input_str[0] == "'" and input_str[len(input_str) - 1] == "'";
+    is_str_wrapped_in_single_quotes = input_str and input_str[0] == "'" and input_str[len(input_str) - 1] == "'";
 
     if(is_str_wrapped_in_single_quotes):
         return [];
@@ -149,6 +142,48 @@ def parse_back_slash_str(input_str, back_slash_char_arr):
        parsed_str += back_slash_char_arr.pop(0);         
 
     return parsed_str;            
+
+# 3 state normal. single. double
+# default is normal => if char == " " end of string, append it [];
+# state => normal and char== " ' " then state => single
+# keep adding chars until char == " ' "
+# then state=> normal , add that string to [] wrapped in single quotes.
+
+def get_cat_string_arr(input_str):
+    cat_str_arr = [];
+    index = 0;
+    state = "normal";
+    parsed_str = "";
+
+    while(index < len(input_str)):
+        char = input_str[index];
+
+        if(state == "normal"):
+            if(char == " "):
+                cat_str_arr.append(parsed_str);
+                parsed_str = "";
+            elif(char == "'"):
+                state = "single_quote";    
+            else:
+                parsed_str += char;
+
+        elif(state == "single_quote"):
+            # end of single quote str
+            if(char == "'"):
+                cat_str_arr.append(f"`{parsed_str}`");
+                parsed_str = "";
+                state = "normal";
+            else:
+                parsed_str += char    
+
+        index += 1;  
+
+    # any pending last str
+    if(parsed_str):
+        cat_str_arr.append(parsed_str);     
+
+    return cat_str_arr;         
+
 
 
 def main():
@@ -229,11 +264,13 @@ def main():
         elif(command == "cat"):
           file_contents = '';
           input_str = " ".join(command_args);
-          parsed_input_arr = parse_input_str(input_str, True);
-         
-          for file_path_input in parsed_input_arr:
+          cat_str_arr = get_cat_string_arr(input_str);
+          print(f"cat_str_arr: {cat_str_arr}") 
+          
+          for file_path_input in cat_str_arr:
             back_slash_chars = track_back_slash_chars(file_path_input);
-            back_slash_parsed_file_path = parse_back_slash_str(file_path_input, back_slash_chars);
+            parsed_input_str = parse_input_str(file_path_input);
+            back_slash_parsed_file_path = parse_back_slash_str(parsed_input_str, back_slash_chars);
            
             if(not back_slash_parsed_file_path.strip()):
                 continue;
