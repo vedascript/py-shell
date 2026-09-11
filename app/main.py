@@ -170,7 +170,7 @@ def get_cat_string_arr(input_str):
         elif(state == "single_quote"):
             # end of single quote str
             if(char == "'"):
-                cat_str_arr.append(f"`{parsed_str}`");
+                cat_str_arr.append(f"'{parsed_str}'");
                 parsed_str = "";
                 state = "normal";
             else:
@@ -182,7 +182,7 @@ def get_cat_string_arr(input_str):
     if(parsed_str):
         cat_str_arr.append(parsed_str);     
 
-    return cat_str_arr;         
+    return list(filter(None, cat_str_arr));         
 
 
 
@@ -265,12 +265,14 @@ def main():
           file_contents = '';
           input_str = " ".join(command_args);
           cat_str_arr = get_cat_string_arr(input_str);
-          
+        
+
           for file_path_input in cat_str_arr:
             back_slash_chars = track_back_slash_chars(file_path_input);
             parsed_input_str = parse_input_str(file_path_input);
             back_slash_parsed_file_path = parse_back_slash_str(parsed_input_str, back_slash_chars);
-           
+        
+
             if(not back_slash_parsed_file_path.strip()):
                 continue;
 
