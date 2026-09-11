@@ -33,9 +33,9 @@ def get_path_type(path):
         return "current_dir"   
 
 def parse_input_str(input_str):
-    is_single_quotes_str = input_str and input_str[0] == "'" and input_str[len(input_str) - 1] == "'";
+    is_double_quotes_str = input_str and input_str[0] == '"' and input_str[len(input_str) - 1] == '"';
 
-    if(not is_single_quotes_str):
+    if(is_double_quotes_str):
         str_arr = input_str.split('"');
         parsed_str = handle_double_quotes_str(str_arr);
     else:
