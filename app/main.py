@@ -216,6 +216,7 @@ def main():
             back_slash_chars = track_back_slash_chars(input_str);
             parsed_str_arr =  get_parsed_string_arr(input_str);
             parsed_input_str = parse_input_str(parsed_str_arr);
+            print(f"parsed_input_str: {parsed_input_str}")
             back_ticks_parsed_str = parse_back_slash_str(parsed_input_str, back_slash_chars);
 
             print(back_ticks_parsed_str);
