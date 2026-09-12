@@ -32,16 +32,21 @@ def get_path_type(path):
     else:
         return "current_dir"   
 
-def parse_input_str(input_str):
+def parse_input_str(parsed_str_arr):
     # is_double_quotes_str = input_str and input_str[0] == '"' and input_str[len(input_str) - 1] == '"';
-    is_double_quotes_str =  input_str and '"' in input_str;
+    parsed_str = "";
 
-    if(is_double_quotes_str):
-        str_arr = input_str.split('"');
-        parsed_str = handle_double_quotes_str(str_arr);
-    else:
-        str_arr = input_str.split("'");  
-        parsed_str = handle_single_quote_str(str_arr)
+    for str in parsed_str_arr:
+        is_double_quotes_str =  str and str[0] == '"' and str[len(str) - 1] == '"' ;
+
+        if(is_double_quotes_str):
+            str_arr = str.split('"');
+            res = handle_double_quotes_str(str_arr);
+            parsed_str += res
+        else:
+            str_arr = str.split("'");  
+            res = handle_single_quote_str(str_arr)
+            parsed_str += res;
 
     return parsed_str;  
 
@@ -144,17 +149,7 @@ def parse_back_slash_str(input_str, back_slash_char_arr):
 
     return parsed_str;            
 
-# 3 state normal. single. double
-# default is normal => if char == " " end of string, append it [];
-# state => normal and char== " ' " then state => single
-# keep adding chars until char == " ' "
-# then state=> normal , add that string to [] wrapped in single quotes.
-
-# state => normal and char == '"' then state => double
-# keep adding chars until char == '"' then append it 
-# state => normal , parsed-str = "";
-
-def get_cat_string_arr(input_str):
+def get_parsed_string_arr(input_str):
     cat_str_arr = [];
     index = 0;
     state = "normal";
@@ -219,7 +214,9 @@ def main():
         elif(command == "echo"):
             input_str = " ".join(command_args);
             back_slash_chars = track_back_slash_chars(input_str);
-            parsed_input_str = parse_input_str(input_str);
+            parsed_str_arr =  get_parsed_string_arr(input_str);
+            print(f"parsed_string_arr: {parsed_str_arr}")
+            parsed_input_str = parse_input_str(parsed_str_arr);
             back_ticks_parsed_str = parse_back_slash_str(parsed_input_str, back_slash_chars);
 
             print(back_ticks_parsed_str);
@@ -280,11 +277,11 @@ def main():
         elif(command == "cat"):
           file_contents = '';
           input_str = " ".join(command_args);
-          cat_str_arr = get_cat_string_arr(input_str);
+          cat_str_arr = get_parsed_string_arr(input_str);
 
           for file_path_input in cat_str_arr:
             back_slash_chars = track_back_slash_chars(file_path_input);
-            parsed_input_str = parse_input_str(file_path_input);
+            parsed_input_str = parse_input_str([file_path_input]);
             back_slash_parsed_file_path = parse_back_slash_str(parsed_input_str, back_slash_chars);
 
             if(not back_slash_parsed_file_path.strip()):
