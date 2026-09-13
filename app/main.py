@@ -35,6 +35,7 @@ def get_path_type(path):
 def parse_input_str(parsed_str_arr):
     # is_double_quotes_str = input_str and input_str[0] == '"' and input_str[len(input_str) - 1] == '"';
     parsed_str = "";
+    is_empty_quoted_str = False;
 
     for str in parsed_str_arr:
         is_double_quotes_str =  str and str[0] == '"' and str[len(str) - 1] == '"' ;
@@ -45,10 +46,11 @@ def parse_input_str(parsed_str_arr):
             parsed_str += res
         else:
             str_arr = str.split("'");  
-            res = handle_single_quote_str(str_arr)
-            parsed_str += res;
+            obj = handle_single_quote_str(str_arr);
+            parsed_str += obj['parsed_input_str'];
+            is_empty_quoted_str = obj["is_empty_quoted_str"];
 
-    return parsed_str;  
+    return {'parsed_input_str' : parsed_str, 'is_empty_quoted_str' : is_empty_quoted_str};
 
 
 
@@ -58,7 +60,7 @@ def handle_single_quote_str(str_arr):
 
     for str in str_arr:
         if(str == " "):
-            parsed_input_str += " ";
+            parsed_input_str += " "; 
         elif(str.count("'") >= 2):
             parsed_input_str += str;    
         elif(len(str) and str[0] == " "):
@@ -70,7 +72,7 @@ def handle_single_quote_str(str_arr):
         else:
             parsed_input_str += str    
         
-    return parsed_input_str.replace("'","");         
+    return {'parsed_input_str': parsed_input_str.replace("'",""), 'is_empty_quoted_str' : is_empty_quoted_str};
 
 def handle_double_quotes_str(str_arr):
     parsed_input_str = '';
@@ -120,7 +122,7 @@ def track_back_slash_chars(input_str):
 
     return back_ticks_before_quote;            
 
-def parse_back_slash_str(input_str, back_slash_char_arr):
+def parse_back_slash_str(input_str, back_slash_char_arr, is_empty_quoted_str):
     index = 0;
     parsed_str = "";
 
@@ -136,6 +138,8 @@ def parse_back_slash_str(input_str, back_slash_char_arr):
             next_char_in_str = input_str[index + 1];
 
             if((back_slash_char == "'" or back_slash_char == '"' ) and not next_char_in_str == back_slash_char):
+                index += 1;
+            elif(is_empty_quoted_str and next_char_in_str == "\\"):
                 index += 1;
             else:    
                 index += 2;
@@ -215,9 +219,8 @@ def main():
             input_str = " ".join(command_args);
             back_slash_chars = track_back_slash_chars(input_str);
             parsed_str_arr =  get_parsed_string_arr(input_str);
-            parsed_input_str = parse_input_str(parsed_str_arr);
-            print(f"parsed_input_str: {parsed_input_str}")
-            back_ticks_parsed_str = parse_back_slash_str(parsed_input_str, back_slash_chars);
+            obj = parse_input_str(parsed_str_arr);
+            back_ticks_parsed_str = parse_back_slash_str(obj["parsed_input_str"], back_slash_chars, obj["is_empty_quoted_str"]);
 
             print(back_ticks_parsed_str);
         elif(command == "pwd"):
@@ -281,8 +284,8 @@ def main():
 
           for file_path_input in cat_str_arr:
             back_slash_chars = track_back_slash_chars(file_path_input);
-            parsed_input_str = parse_input_str([file_path_input]);
-            back_slash_parsed_file_path = parse_back_slash_str(parsed_input_str, back_slash_chars);
+            obj = parse_input_str([file_path_input]);
+            back_slash_parsed_file_path = parse_back_slash_str(obj["parsed_input_str"], back_slash_chars, obj["is_empty_quoted_str"]);
 
             if(not back_slash_parsed_file_path.strip()):
                 continue;
