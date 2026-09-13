@@ -86,8 +86,7 @@ def tokenize(input_str):
     return tokens;
 
 def write_output_to_file(file_name, output):
-    does_file_exists = os.path.exists(file_name) and os.path.isfile(file_name);
-    print(f"does_file_exits: {does_file_exists}");
+    # does_file_exists = os.path.exists(file_name) and os.path.isfile(file_name);
 
     try:
         with open(file_name, "w") as file:
