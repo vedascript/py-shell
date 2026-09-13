@@ -207,14 +207,17 @@ def main():
             exec_config = is_command_executable(command, );
 
             if(exec_config['is_executable']):
-                run_result = subprocess.run([command, *command_args], capture_output=True);
+                if(file_to_write_output):
+                    try:
+                        with open(file_to_write_output, "w") as file:
+                            subprocess.run([command, *command_args],stdout=file);
 
-                if(run_result.returncode == 0 and file_to_write_output):
-                    write_output_to_file(file_to_write_output , run_result.stdout);
-                elif(run_result.returncode == 0):
-                    print(run_result.stdout);
+                    except OSError as e:
+                        print(f"Failed to write to file '{file_to_write_output}': {e}");
+
                 else:
-                    print(run_result.stderr)                
+                    subprocess.run([command, *command_args])               
+                 
             else:    
                 print(f"{command}: command not found");
     
