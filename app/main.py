@@ -85,7 +85,16 @@ def tokenize(input_str):
 
     return tokens;
 
+def write_output_to_file(file_name, output):
+    does_file_exists = os.path.exists(file_name) and os.path.isfile(file_name);
+    print(f"does_file_exits: {does_file_exists}");
 
+    try:
+        with open(file_name, "w") as file:
+            file.write(output)
+    except OSError as e:
+        print(f"Failed to write to file '{file_name}': {e}")        
+    
 
 def main():
     is_shell_running = True;
@@ -100,13 +109,27 @@ def main():
 
         command = tokens[0];
         command_args = tokens[1:];
+        file_to_write_output = None;
+
+
+
+        if(">" in command_args or "1>" in command_args):
+            file_to_write_output = command_args.pop();
+            # this pop is to remove the ">" or "1>" operator
+            command_args.pop();
+
 
         if(command == "exit"):
             is_shell_running = False;
             break;
 
         elif(command == "echo"):
-            print(" ".join(command_args));
+            output = " ".join(command_args);
+
+            if(file_to_write_output):
+                write_output_to_file(file_to_write_output, output)
+            else:
+                print(output);
 
         elif(command == "pwd"):
             print(os.getcwd());  
@@ -162,26 +185,37 @@ def main():
                 else:
                  print(f"{arg}: not found");  
 
-        elif(command == "cat"):
-          file_contents = '';
+        # elif(command == "cat"):
+        #   file_contents = '';
 
-          for file_path_input in command_args:
-            if(not file_path_input.strip()):
-                continue;
+        #   for file_path_input in command_args:
+        #     if(not file_path_input.strip()):
+        #         continue;
 
-            if(os.path.exists(file_path_input) and os.path.isfile(file_path_input)):
-                with open(file_path_input) as file:
-                    content = file.read();
-                    file_contents += content;   
-            else:
-                continue; 
+        #     if(os.path.exists(file_path_input) and os.path.isfile(file_path_input)):
+        #         with open(file_path_input) as file:
+        #             content = file.read();
+        #             file_contents += content;   
+        #     else:
+        #         continue; 
 
-          sys.stdout.write(f"{file_contents}");       
+        #   if(file_to_write_output):
+        #     write_output_to_file(file_to_write_output,file_contents)
+        #   else:     
+        #    sys.stdout.write(f"{file_contents}");       
 
-        else:    
-            exec_config = is_command_executable(command);
+        else:  
+            exec_config = is_command_executable(command, );
+
             if(exec_config['is_executable']):
-                subprocess.run([command, *command_args]);
+                run_result = subprocess.run([command, *command_args], capture_output=True);
+
+                if(run_result.returncode == 0 and file_to_write_output):
+                    write_output_to_file(file_to_write_output , run_result.stdout);
+                elif(run_result.returncode == 0):
+                    print(run_result.stdout);
+                else:
+                    print(run_result.stderr)                
             else:    
                 print(f"{command}: command not found");
     
