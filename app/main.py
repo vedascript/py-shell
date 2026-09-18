@@ -4,6 +4,7 @@ import os
 import subprocess
 
 builtin_commands = ["exit", "echo", "pwd", "type", "cd"];
+file_overwrite_modes = {">": "w" , "1>":"w"};
  
 
 def is_command_executable(command_to_run):
@@ -36,6 +37,9 @@ def tokenize(input_str):
     has_token = False;
     state = "normal";
     index = 0;
+    should_overwrite_stdout = False;
+    overwrite_mode = "";
+
 
     while(index < len(input_str)):
         char = input_str[index];
@@ -57,6 +61,10 @@ def tokenize(input_str):
                 current_token += next_char;
                 has_token = True;
                 index += 1;
+            elif(char == ">" or char == "1>"):
+                should_overwrite_stdout = True;
+                overwrite_mode = file_overwrite_modes[char];
+                current_token += char;
             else:
                 current_token += char;
                 has_token = True;
@@ -83,144 +91,115 @@ def tokenize(input_str):
     if(has_token):
         tokens.append(current_token);
 
-    return tokens;
-
-def write_output_to_file(file_name, output):
-    # does_file_exists = os.path.exists(file_name) and os.path.isfile(file_name);
-
-    try:
-        with open(file_name, "w") as file:
-            file.write(output)
-    except OSError as e:
-        print(f"Failed to write to file '{file_name}': {e}")        
-    
+    return {"tokens": tokens, "should_overwrite_stdout": should_overwrite_stdout, "overwrite_mode": overwrite_mode};
+           
 
 def main():
     is_shell_running = True;
+    output = sys.stdout;
 
     while is_shell_running:
-        sys.stdout.write("$ ")
-        # REPL is achieved using input
-        tokens = tokenize(input());
+        try:      
+            sys.stdout.write("$ ")
+            # REPL is achieved using input
+            file_to_write_output = None;
+            tokens_config = tokenize(input());
 
-        if(not tokens):
-            continue;
+            tokens = tokens_config["tokens"];
+            should_overwrite_stdout = tokens_config["should_overwrite_stdout"];
+            overwrite_mode = tokens_config["overwrite_mode"];
 
-        command = tokens[0];
-        command_args = tokens[1:];
-        file_to_write_output = None;
+            if(not tokens):
+                continue;
+
+            command = tokens[0];
+            command_args = tokens[1:];
+
+            if(">" in command_args or "1>" in command_args):
+                file_to_write_output = command_args.pop();
+                # this pop is to remove the ">" or "1>" operator
+                command_args.pop();
+                try:
+                    output = open(file_to_write_output, overwrite_mode);
+                except OSError as e:
+                    print(f"shell: {file_to_write_output}: {e.strerror}", file=sys.stderr);  
+                    continue;   
 
 
+            if(command == "exit"):
+                is_shell_running = False;
+                break;
 
-        if(">" in command_args or "1>" in command_args):
-            file_to_write_output = command_args.pop();
-            # this pop is to remove the ">" or "1>" operator
-            command_args.pop();
+            elif(command == "echo"):
+                command_args_str = " ".join(command_args);
+                print(command_args_str, file=output)
+        
 
+            elif(command == "pwd"):
+                print(os.getcwd(), file=output);  
 
-        if(command == "exit"):
-            is_shell_running = False;
-            break;
+            elif(command == "cd"):
+                path_exists = False;
+                path = command_args[0];
+                path_type =  get_path_type(path);
 
-        elif(command == "echo"):
-            output = " ".join(command_args);
-
-            if(file_to_write_output):
-                write_output_to_file(file_to_write_output, output)
-            else:
-                print(output);
-
-        elif(command == "pwd"):
-            print(os.getcwd());  
-
-        elif(command == "cd"):
-            path_exists = False;
-            path = command_args[0];
-            path_type =  get_path_type(path);
-
-            if(path_type == 'absolute' and os.path.exists(path)):
-                path_exists = True;
-                os.chdir(path);
-
-            elif(path_type == 'current_dir'):
-                absolute_path = os.getcwd();
-                target_path = absolute_path + path[1:];
-
-                if(os.path.exists(path)):
-                     path_exists = True;
-                     os.chdir(target_path);
-
-            elif(path_type == 'parent_dir'):
-                absolute_path = os.getcwd();
-                path_arr = path.split('/');
-                navigate_back_dir_count = 0;
-
-                for item in path_arr:
-                    if(item == '..'):
-                        navigate_back_dir_count += 1;
-
-                shortened_path_arr = absolute_path.split('/')[:-navigate_back_dir_count];
-                updated_path = "/".join(shortened_path_arr);
-
-                if(os.path.exists(updated_path)):
+                if(path_type == 'absolute' and os.path.exists(path)):
                     path_exists = True;
-                    os.chdir(updated_path)
+                    os.chdir(path);
 
-            elif(path_type == 'home_dir'):
-                home_env = os.getenv("HOME");    
-                path_exists = True;
-                os.chdir(home_env);   
+                elif(path_type == 'current_dir'):
+                    absolute_path = os.getcwd();
+                    target_path = absolute_path + path[1:];
 
-            not path_exists and print(f"cd: {path}: No such file or directory")    
+                    if(os.path.exists(path)):
+                        path_exists = True;
+                        os.chdir(target_path);
 
-        elif(command == "type"):
-            arg = "".join(command_args);
-            if(arg in builtin_commands):
-                print(f"{arg} is a shell builtin");
-            else:
-                exec_config = is_command_executable(arg);   
-                if(exec_config['is_executable']):
-                    print(f"{arg} is {exec_config['file_path']}");
+                elif(path_type == 'parent_dir'):
+                    absolute_path = os.getcwd();
+                    path_arr = path.split('/');
+                    navigate_back_dir_count = 0;
+
+                    for item in path_arr:
+                        if(item == '..'):
+                            navigate_back_dir_count += 1;
+
+                    shortened_path_arr = absolute_path.split('/')[:-navigate_back_dir_count];
+                    updated_path = "/".join(shortened_path_arr);
+
+                    if(os.path.exists(updated_path)):
+                        path_exists = True;
+                        os.chdir(updated_path)
+
+                elif(path_type == 'home_dir'):
+                    home_env = os.getenv("HOME");    
+                    path_exists = True;
+                    os.chdir(home_env);   
+
+                not path_exists and print(f"cd: {path}: No such file or directory")    
+
+            elif(command == "type"):
+                arg = "".join(command_args);
+                if(arg in builtin_commands):
+                    print(f"{arg} is a shell builtin", file=output);
                 else:
-                 print(f"{arg}: not found");  
+                    exec_config = is_command_executable(arg);   
+                    if(exec_config['is_executable']):
+                        print(f"{arg} is {exec_config['file_path']}", file=output);
+                    else:
+                        print(f"{arg}: not found");       
 
-        # elif(command == "cat"):
-        #   file_contents = '';
+            else:  
+                exec_config = is_command_executable(command, );
 
-        #   for file_path_input in command_args:
-        #     if(not file_path_input.strip()):
-        #         continue;
-
-        #     if(os.path.exists(file_path_input) and os.path.isfile(file_path_input)):
-        #         with open(file_path_input) as file:
-        #             content = file.read();
-        #             file_contents += content;   
-        #     else:
-        #         continue; 
-
-        #   if(file_to_write_output):
-        #     write_output_to_file(file_to_write_output,file_contents)
-        #   else:     
-        #    sys.stdout.write(f"{file_contents}");       
-
-        else:  
-            exec_config = is_command_executable(command, );
-
-            if(exec_config['is_executable']):
-                if(file_to_write_output):
-                    try:
-                        with open(file_to_write_output, "w") as file:
-                            subprocess.run([command, *command_args],stdout=file);
-
-                    except OSError as e:
-                        print(f"Failed to write to file '{file_to_write_output}': {e}");
-
-                else:
-                    subprocess.run([command, *command_args])               
-                 
-            else:    
-                print(f"{command}: command not found");
-    
+                if(exec_config['is_executable']): 
+                    subprocess.run([command, *command_args],stdout=output);     
+                else:    
+                    print(f"{command}: command not found");
+        finally:
+            if(not output == sys.stdout):
+                output.close();
+            
 if __name__ == "__main__":
     main()
 
