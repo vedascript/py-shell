@@ -39,6 +39,7 @@ def tokenize(input_str):
     index = 0;
     should_overwrite_stdout = False;
     overwrite_mode = "";
+    file_to_write_output = None;
 
 
     while(index < len(input_str)):
@@ -62,9 +63,11 @@ def tokenize(input_str):
                 has_token = True;
                 index += 1;
             elif(char == ">" or char == "1>"):
-                should_overwrite_stdout = True;
+                # should_overwrite_stdout = True;
+                file_to_write_output = input_str[index+1:];
                 overwrite_mode = file_overwrite_modes[char];
                 current_token += char;
+                break;
             else:
                 current_token += char;
                 has_token = True;
@@ -91,19 +94,21 @@ def tokenize(input_str):
     if(has_token):
         tokens.append(current_token);
 
-    return {"tokens": tokens, "should_overwrite_stdout": should_overwrite_stdout, "overwrite_mode": overwrite_mode};
+    return {"tokens": tokens, "file_to_write_output": file_to_write_output, "overwrite_mode": overwrite_mode};
 
 
-def parse_redirection_str(command_args):
-    try:
-        index =  command_args.index(">");
-    except ValueError:
-        index = command_args.index("1>");
+# def parse_redirection_str(command_args):
+#     print(f"command_args: {command_args}");
 
-    updated_command_args = command_args[:-index-1];
-    file_to_write_output = command_args[index+1:];
+#     try:
+#         index =  command_args.index(">");
+#     except ValueError:
+#         index = command_args.index("1>");
 
-    return {"updated_command_args": updated_command_args, "file_to_write_output": file_to_write_output};       
+#     updated_command_args = command_args[:-index-1];
+#     file_to_write_output = command_args[index+1:];
+
+#     return {"updated_command_args": updated_command_args, "file_to_write_output": file_to_write_output};       
            
 
 def main():
@@ -118,7 +123,7 @@ def main():
             tokens_config = tokenize(input());
 
             tokens = tokens_config["tokens"];
-            should_overwrite_stdout = tokens_config["should_overwrite_stdout"];
+            file_to_write_output = tokens_config["file_to_write_output"];
             overwrite_mode = tokens_config["overwrite_mode"];
 
             if(not tokens):
@@ -127,10 +132,10 @@ def main():
             command = tokens[0];
             command_args = tokens[1:];
 
-            if(should_overwrite_stdout):
-                parse_config = parse_redirection_str(command_args);
-                command_args = parse_config['updated_command_args'];
-                file_to_write_output = parse_config['file_to_write_output'];
+            if(file_to_write_output):
+                # parse_config = parse_redirection_str(command_args);
+                # command_args = parse_config['updated_command_args'];
+                # file_to_write_output = parse_config['file_to_write_output'];
 
                 try:
                     output = open(file_to_write_output, overwrite_mode);
@@ -202,10 +207,10 @@ def main():
                         print(f"{arg}: not found");       
 
             else:  
-                exec_config = is_command_executable(command, );
+                exec_config = is_command_executable(command);
 
                 if(exec_config['is_executable']): 
-                    subprocess.run([command, *command_args],stdout=output);     
+                    subprocess.run([command, *command_args], stdout=output);     
                 else:    
                     print(f"{command}: command not found");
         finally:
