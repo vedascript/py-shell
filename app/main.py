@@ -92,6 +92,18 @@ def tokenize(input_str):
         tokens.append(current_token);
 
     return {"tokens": tokens, "should_overwrite_stdout": should_overwrite_stdout, "overwrite_mode": overwrite_mode};
+
+
+def parse_redirection_str(command_args):
+    try:
+        index =  command_args.index(">");
+    except ValueError:
+        index = command_args.index("1>");
+
+    updated_command_args = command_args[:-index-1];
+    file_to_write_output = command_args[index+1:];
+
+    return {"updated_command_args": updated_command_args, "file_to_write_output": file_to_write_output};       
            
 
 def main():
@@ -115,16 +127,16 @@ def main():
             command = tokens[0];
             command_args = tokens[1:];
 
-            if(">" in command_args or "1>" in command_args):
-                file_to_write_output = command_args.pop();
-                # this pop is to remove the ">" or "1>" operator
-                command_args.pop();
+            if(should_overwrite_stdout):
+                parse_config = parse_redirection_str(command_args);
+                command_args = parse_config['updated_command_args'];
+                file_to_write_output = parse_config['file_to_write_output'];
+
                 try:
                     output = open(file_to_write_output, overwrite_mode);
                 except OSError as e:
                     print(f"shell: {file_to_write_output}: {e.strerror}", file=sys.stderr);  
-                    continue;   
-
+                    continue;    
 
             if(command == "exit"):
                 is_shell_running = False;
