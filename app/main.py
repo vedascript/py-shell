@@ -2,6 +2,7 @@
 import sys
 import os
 import subprocess
+import token
 
 builtin_commands = ["exit", "echo", "pwd", "type", "cd"];
 file_overwrite_modes = {">": "w" , "1>":"w"};
@@ -37,10 +38,7 @@ def tokenize(input_str):
     has_token = False;
     state = "normal";
     index = 0;
-    should_overwrite_stdout = False;
     overwrite_mode = "";
-    file_to_write_output = None;
-
 
     while(index < len(input_str)):
         char = input_str[index];
@@ -62,12 +60,20 @@ def tokenize(input_str):
                 current_token += next_char;
                 has_token = True;
                 index += 1;
-            elif(char == ">" or char == "1>"):
-                # should_overwrite_stdout = True;
-                file_to_write_output = input_str[index+1:];
+            elif(char == ">"):
+                if(has_token):
+                    has_token = False;
+                    tokens.append(current_token);
+                    current_token = "";
+
                 overwrite_mode = file_overwrite_modes[char];
-                current_token += char;
-                break;
+            elif(char == "1" and next_char == ">"):
+                if(has_token):
+                    has_token = False;
+                    tokens.append(current_token);
+                    current_token = "";
+                overwrite_mode = file_overwrite_modes["1>"];  
+                index +=1 ; 
             else:
                 current_token += char;
                 has_token = True;
@@ -94,21 +100,7 @@ def tokenize(input_str):
     if(has_token):
         tokens.append(current_token);
 
-    return {"tokens": tokens, "file_to_write_output": file_to_write_output, "overwrite_mode": overwrite_mode};
-
-
-# def parse_redirection_str(command_args):
-#     print(f"command_args: {command_args}");
-
-#     try:
-#         index =  command_args.index(">");
-#     except ValueError:
-#         index = command_args.index("1>");
-
-#     updated_command_args = command_args[:-index-1];
-#     file_to_write_output = command_args[index+1:];
-
-#     return {"updated_command_args": updated_command_args, "file_to_write_output": file_to_write_output};       
+    return {"tokens": tokens, "overwrite_mode": overwrite_mode};    
            
 
 def main():
@@ -123,20 +115,21 @@ def main():
             tokens_config = tokenize(input());
 
             tokens = tokens_config["tokens"];
-            file_to_write_output = tokens_config["file_to_write_output"];
             overwrite_mode = tokens_config["overwrite_mode"];
 
             if(not tokens):
                 continue;
 
             command = tokens[0];
-            command_args = tokens[1:];
 
+            if(overwrite_mode):
+                command_args = tokens[1:-1];
+                file_to_write_output = tokens.pop();
+            else:
+                command_args = tokens[1:];    
+      
+         
             if(file_to_write_output):
-                # parse_config = parse_redirection_str(command_args);
-                # command_args = parse_config['updated_command_args'];
-                # file_to_write_output = parse_config['file_to_write_output'];
-
                 try:
                     output = open(file_to_write_output, overwrite_mode);
                 except OSError as e:
@@ -196,7 +189,7 @@ def main():
                 not path_exists and print(f"cd: {path}: No such file or directory")    
 
             elif(command == "type"):
-                arg = "".join(command_args);
+                arg = "".join(command_args)
                 if(arg in builtin_commands):
                     print(f"{arg} is a shell builtin", file=output);
                 else:
@@ -216,6 +209,8 @@ def main():
         finally:
             if(not output == sys.stdout):
                 output.close();
+                output = sys.stdout;
+
             
 if __name__ == "__main__":
     main()
