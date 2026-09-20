@@ -6,6 +6,7 @@ import token
 
 builtin_commands = ["exit", "echo", "pwd", "type", "cd"];
 file_overwrite_modes = {">": "w" , "1>":"w"};
+file_descriptor_dic = {} 
  
 
 def is_command_executable(command_to_run):
@@ -32,6 +33,10 @@ def get_path_type(path):
     else:
         return "current_dir"   
 
+def push_reset_token(tokens_arr,curr_token):
+    tokens_arr.append(curr_token);
+    return "", False
+
 def tokenize(input_str):
     tokens = [];
     current_token = "";
@@ -39,6 +44,7 @@ def tokenize(input_str):
     state = "normal";
     index = 0;
     overwrite_mode = "";
+    file_descriptor = None;
 
     while(index < len(input_str)):
         char = input_str[index];
@@ -47,9 +53,7 @@ def tokenize(input_str):
         if(state == "normal"):
             if(char == " "):
                 if(has_token):
-                    tokens.append(current_token);
-                    current_token = "";
-                    has_token = False;
+                    current_token, has_token = push_reset_token(tokens, current_token);
             elif(char == "'"):
                 state = "single_quote";
                 has_token = True;
@@ -62,18 +66,21 @@ def tokenize(input_str):
                 index += 1;
             elif(char == ">"):
                 if(has_token):
-                    has_token = False;
-                    tokens.append(current_token);
-                    current_token = "";
-
+                    current_token, has_token = push_reset_token(tokens, current_token);
                 overwrite_mode = file_overwrite_modes[char];
+                file_descriptor = "OUTPUT";
             elif(char == "1" and next_char == ">"):
                 if(has_token):
-                    has_token = False;
-                    tokens.append(current_token);
-                    current_token = "";
-                overwrite_mode = file_overwrite_modes["1>"];  
+                    current_token, has_token = push_reset_token(tokens, current_token);
+                overwrite_mode = file_overwrite_modes["1>"]; 
+                file_descriptor = "OUTPUT"; 
                 index +=1 ; 
+            elif(char == "2" and next_char == ">"):
+                if(has_token):
+                    current_token, has_token = push_reset_token(tokens, current_token); 
+                overwrite_mode = file_overwrite_modes[">"];  
+                file_descriptor = "ERROR";
+                index += 1;
             else:
                 current_token += char;
                 has_token = True;
@@ -100,12 +107,13 @@ def tokenize(input_str):
     if(has_token):
         tokens.append(current_token);
 
-    return {"tokens": tokens, "overwrite_mode": overwrite_mode};    
+    return {"tokens": tokens, "overwrite_mode": overwrite_mode, "file_descriptor": file_descriptor};    
            
 
 def main():
     is_shell_running = True;
     output = sys.stdout;
+    error_output = sys.stderr;
 
     while is_shell_running:
         try:      
@@ -116,22 +124,26 @@ def main():
 
             tokens = tokens_config["tokens"];
             overwrite_mode = tokens_config["overwrite_mode"];
+            file_descriptor = tokens_config["file_descriptor"]
 
             if(not tokens):
                 continue;
 
             command = tokens[0];
 
-            if(overwrite_mode):
+            if(file_descriptor):
                 command_args = tokens[1:-1];
                 file_to_write_output = tokens.pop();
             else:
                 command_args = tokens[1:];    
       
          
-            if(file_to_write_output):
+            if(file_descriptor):
                 try:
-                    output = open(file_to_write_output, overwrite_mode);
+                    if(file_descriptor == "OUTPUT"):
+                        output = open(file_to_write_output, overwrite_mode);
+                    else:
+                        error_output = open(file_to_write_output, overwrite_mode);    
                 except OSError as e:
                     print(f"shell: {file_to_write_output}: {e.strerror}", file=sys.stderr);  
                     continue;    
@@ -186,7 +198,7 @@ def main():
                     path_exists = True;
                     os.chdir(home_env);   
 
-                not path_exists and print(f"cd: {path}: No such file or directory")    
+                not path_exists and print(f"cd: {path}: No such file or directory", file = error_output)    
 
             elif(command == "type"):
                 arg = "".join(command_args)
@@ -197,19 +209,22 @@ def main():
                     if(exec_config['is_executable']):
                         print(f"{arg} is {exec_config['file_path']}", file=output);
                     else:
-                        print(f"{arg}: not found");       
+                        print(f"{arg}: not found", file = error_output);       
 
             else:  
                 exec_config = is_command_executable(command);
 
                 if(exec_config['is_executable']): 
-                    subprocess.run([command, *command_args], stdout=output);     
+                    subprocess.run([command, *command_args], stdout = output, stderr = error_output);     
                 else:    
-                    print(f"{command}: command not found");
+                    print(f"{command}: command not found", file = error_output);
         finally:
-            if(not output == sys.stdout):
+            if(output is not sys.stdout):
                 output.close();
                 output = sys.stdout;
+            if(error_output is not sys.stderr):
+                error_output.close();
+                error_output = sys.stderr;    
 
             
 if __name__ == "__main__":
